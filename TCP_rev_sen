@@ -1,0 +1,100 @@
+C. TCP Client and Server Application to Reverse a Sentence in C
+Server Code:
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+
+void reverse_string(char *str) {
+    int len = strlen(str);
+    for (int i = 0; i < len / 2; i++) {
+        char temp = str[i];
+        str[i] = str[len - i - 1];
+        str[len - i - 1] = temp;
+    }
+}
+
+int main() {
+    int server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_fd == -1) {
+        perror("Socket creation failed");
+        return 1;
+    }
+
+    struct sockaddr_in server_addr = {0};
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(8080);
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+
+    bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr));
+    listen(server_fd, 5);
+
+    printf("Server is listening...\n");
+
+    int client_fd = accept(server_fd, NULL, NULL);
+    char buffer[1024] = {0};
+    read(client_fd, buffer, sizeof(buffer));
+
+    reverse_string(buffer);
+    write(client_fd, buffer, strlen(buffer));
+
+    close(client_fd);
+    close(server_fd);
+    return 0;
+}
+
+Client Code:
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+
+int main() {
+    int client_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (client_fd == -1) {
+        perror("Socket creation failed");
+        return 1;
+    }
+
+    struct sockaddr_in server_addr = {0};
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(8080);
+    server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+    connect(client_fd, (struct sockaddr*)&server_addr, sizeof(server_addr));
+
+    char message[1024];
+    printf("Enter a sentence: ");
+    fgets(message, sizeof(message), stdin);
+    message[strcspn(message, "\n")] = '\0';
+
+    write(client_fd, message, strlen(message));
+
+    char response[1024] = {0};
+    read(client_fd, response, sizeof(response));
+    printf("Reversed sentence: %s\n", response);
+
+    close(client_fd);
+    return 0;
+}
+Steps to Execute on macOS:
+
+Save the server program as tcp_server.c and the client program as tcp_client.c.
+Compile both:
+bash
+Copy code
+gcc tcp_server.c -o tcp_server
+gcc tcp_client.c -o tcp_client
+Open two terminal windows:
+In one, start the server:
+bash
+Copy code
+./tcp_server
+In the other, run the client:
+bash
+Copy code
+./tcp_client
