@@ -1,7 +1,8 @@
 #!/bin/bash
 # Prompt the user for input
 read -p "Enter a string: " input_string
-# Use the 'rev' command to reverse the string reversed_string=$(echo "$input_string" | rev)
+# Use the 'rev' command to reverse the string 
+reversed_string=$(echo "$input_string" | rev)
 # Print the reversed string
 echo "Reversed string: $reversed_string"
 #output:- chmod +x reverse_string.sh ./reverse_string.sh  
