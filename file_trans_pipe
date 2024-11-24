@@ -1,0 +1,37 @@
+B. Implement File Transfer Using Pipes (IPC)
+Producer Script (writes to the pipe):
+
+bash
+Copy code
+#!/bin/bash
+# Producer script for file transfer
+echo "Enter the filename to transfer:"
+read filename
+cat "$filename" > mypipe
+Consumer Script (reads from the pipe):
+
+bash
+Copy code
+#!/bin/bash
+# Consumer script for file transfer
+cat < mypipe > output_file
+echo "File received and saved as output_file"
+Steps to Execute on macOS:
+
+Create a named pipe:
+bash
+Copy code
+mkfifo mypipe
+Save the producer script as producer.sh and the consumer script as consumer.sh.
+Make them executable:
+bash
+Copy code
+chmod +x producer.sh consumer.sh
+In one terminal, run the consumer:
+bash
+Copy code
+./consumer.sh
+In another terminal, run the producer:
+bash
+Copy code
+./producer.sh
