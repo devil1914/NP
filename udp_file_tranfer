@@ -1,0 +1,85 @@
+D. UDP Client and Server Application to Transfer File in C
+Server Code:
+
+c
+Copy code
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <arpa/inet.h>
+
+int main() {
+    int server_fd = socket(AF_INET, SOCK_DGRAM, 0);
+    struct sockaddr_in server_addr = {0}, client_addr = {0};
+
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(8080);
+    server_addr.sin_addr.s_addr = INADDR_ANY;
+
+    bind(server_fd, (struct sockaddr*)&server_addr, sizeof(server_addr));
+
+    FILE *file = fopen("received_file", "wb");
+    char buffer[1024];
+    socklen_t addr_len = sizeof(client_addr);
+
+    while (1) {
+        int bytes = recvfrom(server_fd, buffer, sizeof(buffer), 0, (struct sockaddr*)&client_addr, &addr_len);
+        if (bytes <= 0) break;
+        fwrite(buffer, 1, bytes, file);
+    }
+
+    fclose(file);
+    close(server_fd);
+    return 0;
+}
+Client Code:
+
+c
+Copy code
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <arpa/inet.h>
+
+int main() {
+    int client_fd = socket(AF_INET, SOCK_DGRAM, 0);
+    struct sockaddr_in server_addr = {0};
+
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(8080);
+    server_addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+
+    char filename[100];
+    printf("Enter the filename to send: ");
+    scanf("%s", filename);
+
+    FILE *file = fopen(filename, "rb");
+    char buffer[1024];
+
+    while (1) {
+        int bytes = fread(buffer, 1, sizeof(buffer), file);
+        if (bytes <= 0) break;
+        sendto(client_fd, buffer, bytes, 0, (struct sockaddr*)&server_addr, sizeof(server_addr));
+    }
+
+    fclose(file);
+    close(client_fd);
+    return 0;
+}
+Steps to Execute on macOS:
+
+Save the server program as udp_server.c and the client program as udp_client.c.
+Compile both:
+bash
+Copy code
+gcc udp_server.c -o udp_server
+gcc udp_client.c -o udp_client
+Open two terminal windows:
+In one, start the server:
+bash
+Copy code
+./udp_server
+In the other, run the client:
+bash
+Copy code
+./udp_client
