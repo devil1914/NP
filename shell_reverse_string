@@ -1,0 +1,27 @@
+#!/bin/bash
+# Prompt the user for input
+read -p "Enter a string: " input_string
+# Use the 'rev' command to reverse the string reversed_string=$(echo "$input_string" | rev)
+# Print the reversed string
+echo "Reversed string: $reversed_string"
+#output:- chmod +x reverse_string.sh ./reverse_string.sh  
+
+
+#!/bin/bash
+# Reverse a string
+
+echo "Enter a string:"
+read str
+rev_str=$(echo "$str" | rev)
+echo "Reversed string: $rev_str"
+
+#Save the script as reverse_string.sh.
+#Open the terminal and navigate to the file's directory.
+#Make the script executable:
+bash
+chmod +x reverse_string.sh
+#Run the script:
+bash
+./reverse_string.sh
+
+
